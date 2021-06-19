@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
-const { validateProfile, getProfile, updateProfile } = require('../../controllers/profile');
+const { 
+    validateProfile, 
+    getProfile, 
+    updateProfile, 
+    getAllProfiles, 
+    getProfileById,
+    deleteProfile 
+    } = require('../../controllers/profile');
 
 
 // @GET api/profile/me (individual user profile)
@@ -14,6 +21,25 @@ router.get('/me', auth, getProfile);
 // @access private
 router.post('/', [auth, validateProfile], updateProfile);
 
+
+
+// @GET api/profile
+// @desc get all profiles
+// @access public
+router.get('/', getAllProfiles);
+
+
+
+// @GET api/profile/:user_id
+// @desc get profile by user id
+// @access public
+router.get('/:user_id', getProfileById);
+
+
+// @DELETE api/profile
+// @desc delete profile and user
+// @access private
+router.delete('/', auth, deleteProfile);
 
 
 module.exports = router;

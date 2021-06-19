@@ -83,8 +83,51 @@ const updateProfile = async (req, res) => {
 }
 
 
+const getAllProfiles = async (req, res) => {
+    try {
+        const profiles = await Profile.find().populate('user', ['name', 'avatar']);
+        return res.json(profiles);
+    } catch (error) {
+        console.error(err.message);
+        res.status(500).json('Server error');
+    }
+}
 
 
+const getProfileById = async (req, res) => {
+    try {
+        const profile = await Profile.findOne({user: req.params.user_id}).populate('user', ['name', 'avatar']);
+        if(!profile) {
+            return res.status(400).json({msg: 'Profile not found'})
+        }
+        return res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        if(err.kind == "ObjectId") {
+            return res.status(400).json({msg: 'Profile not found'})
+        }
+        res.status(500).json('Server error');
+    }
+}
+
+const deleteProfile = async (req, res) => {
+    try {
+        //This will remove profile, user and posts
+        await Profile.findOneAndRemove({user: req.user.id});
+        await User.findOneAndRemove({_id: req.user.id});
+        return res.send('Profile deleted')
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json('Server error');
+    }
+}
 
 
-module.exports = {validateProfile, getProfile, updateProfile};
+module.exports = {
+    validateProfile, 
+    getProfile, 
+    updateProfile, 
+    getAllProfiles, 
+    getProfileById,
+    deleteProfile
+};
